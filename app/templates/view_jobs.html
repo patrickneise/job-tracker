@@ -1,0 +1,36 @@
+{% if not request.headers["hx-request"] %}
+{% extends "_base.html" %}
+{% endif %}
+
+{% block content %}
+
+<h1 class="text-2xl">Jobs</h1>
+<button hx-get="/jobs/create" hx-target="#content" hx-push-url="true">
+  Create Job
+</button>
+<div class="flex flex-col lg:flex-row">
+  {% for status in statuses %}
+  <div class="flex flex-col border border-blue-700 w-1/5 mx-2" hx-target="closest .job" hx-swap="outerHTML">
+    <p class="mx-auto">{{status|upper}}</p>
+    {% for job in jobs %}
+    {% if job.status == status %}
+    <div class="job border p-4 w-52 mx-auto border-green-600">
+      <h3 class="text-lg">{{job.title}}</h3>
+      <a href="{{job.website}}">{{job.company}}</a>
+      <p class="my-2">{{job.description}}</p>
+      <a href="{{job.posting}}">Job Posting</a>
+      <!-- <a href="/jobs/{{job.id}}">View</a> -->
+      <button hx-get="/jobs/{{job.id}}" hx-target="#content" hx-push-url="true">
+        View
+      </button>
+      <button hx-delete="/jobs/{{job.id}}">
+        Delete
+      </button>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock content %}

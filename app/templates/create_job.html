@@ -1,0 +1,23 @@
+{% if not request.headers["hx-request"] %}
+{% extends "_base.html" %}
+{% endif %}
+
+{% block content %}
+
+<h1 class="text-2xl font-semibold">Create Job</h1>
+
+<form class="flex flex-col" hx-post="/jobs" hx-target="#content">
+  <label>Company: <input type="text" name="company" id="company"></label>
+  <label>Title: <input type="text" name="title" id="title"></label>
+  <label>Description:<input type="text" name="description" id="description"></label>
+  <label>Job Posting:<input type="text" name="posting" id="posting"></label>
+  <label>Company Website:<input type="text" name="website" id="website"></label>
+  <label for="status">Status:</label>
+  <select name="status" id="status">
+    {% for status in statuses %}
+    <option value="{{status}}">{{status}}</option>
+    {% endfor %}
+  </select>
+  <input type="submit" value="Submit">
+</form>
+{% endblock content %}

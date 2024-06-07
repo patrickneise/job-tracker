@@ -1,0 +1,35 @@
+{% if not request.headers["hx-request"] %}
+{% extends "_base.html" %}
+{% endif %}
+
+{% block content %}
+
+<div hx-target="this" hx-swap="outerHTML">
+
+  <h1 class="text-2xl font-semibold">{{job.title}}</h1>
+  <a href="{{job.website}}">{{job.company}}</a>
+  <p class="my-2">{{job.description}}</p>
+  <a href="{{job.posting}}">Job Posting</a>
+  <p>{{job.status}}</p>
+
+  <h2 class="text-lg font-normal">Contacts</h2>
+  <div class="my-4 flex gap-4">
+    {% for contact in job.contacts %}
+    <div class="min-w-48 border border-green-600">
+      <p>{{contact.name}}</p>
+      <p>{{contact.email}}</p>
+      <p>{{contact.phone}}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div>
+    <button hx-get="/jobs/{{job.id}}/edit" hx-push-url="true">
+      Edit
+    </button>
+    <button hx-delete="/jobs/{{job.id}}" hx-push-url="true">
+      Delete
+    </button>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,25 @@
+{% if not request.headers["hx-request"] %}
+{% extends "_base.html" %}
+{% endif %}
+
+{% block content %}
+
+<form class="flex flex-col" hx-put="/jobs/{{job.id}}" hx-target="this" hx-swap="outerHTML" hx-push-url="true">
+  <label>Company: <input type="text" name="company" id="company" value="{{job.company}}"></label>
+  <label>Title: <input type="text" name="title" id="title" value="{{job.title}}"></label>
+  <label>Description:<input type=" text" name="description" id="description" value="{{job.description}}"></label>
+  <label>Job Posting:<input type=" text" name="posting" id="posting" value="{{job.posting}}"></label>
+  <label>Company Website:<input type=" text" name="website" id="website" value="{{job.website}}"></label>
+  <label for=" status">Status:</label>
+  <select name="status" id="status">
+    {% for status in statuses %}
+    {% if job.status == status %}
+    <option value="{{status}}" selected>{{status}}</option>
+    {% else %}
+    <option value="{{status}}">{{status}}</option>
+    {% endif %}
+    {% endfor %}
+  </select>
+  <input type="submit" value="Submit">
+</form>
+{% endblock content %}
