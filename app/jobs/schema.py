@@ -6,10 +6,10 @@ from typing import List
 from fastapi import Form
 from pydantic import BaseModel, ConfigDict, HttpUrl, field_serializer
 
-from app.models.mixins import Status
-from app.schemas.contact import Contact
-from app.schemas.note import Note
-from app.schemas.utils import as_form
+from app.contacts.schema import Contact
+from app.models import Status
+from app.notes.schema import Note
+from app.utils import as_form
 
 
 class JobBase(BaseModel):

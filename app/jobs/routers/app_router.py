@@ -6,10 +6,10 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from app.crud import jobs
 from app.database import EntryConflict, EntryNotFound, get_db
-from app.models.mixins import Status
-from app.schemas.job import JobCreate, JobUpdate
+from app.jobs import crud
+from app.jobs.schema import JobCreate, JobUpdate
+from app.models import Status
 
 STATUSES = list(get_args(Status))
 
@@ -17,7 +17,6 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 templates = Jinja2Templates(directory=Path("app") / "templates")
 
 
-# Create
 @router.get("/create", response_class=HTMLResponse)
 def get_create_job_form(request: Request):
     return templates.TemplateResponse(
@@ -31,12 +30,12 @@ def create_job(
     job_create: JobCreate = Depends(JobCreate.as_form),
     db: Session = Depends(get_db),
 ):
-    db_job = jobs.read_job_by_company_title(
+    db_job = crud.read_job_by_company_title(
         db=db, company=job_create.company, title=job_create.title
     )
     if db_job:
         raise HTTPException(status_code=400, detail="Job already exists")
-    created_job = jobs.create_job(db=db, job_create=job_create)
+    created_job = crud.create_job(db=db, job_create=job_create)
     return templates.TemplateResponse(
         request,
         "view_job.html",
@@ -45,10 +44,9 @@ def create_job(
     )
 
 
-# Read
 @router.get("/{job_id}", response_class=HTMLResponse)
 def get_job(request: Request, job_id: int, db: Session = Depends(get_db)):
-    job = jobs.read_job(db=db, job_id=job_id)
+    job = crud.read_job(db=db, job_id=job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return templates.TemplateResponse(request, "view_job.html", {"job": job})
@@ -58,7 +56,7 @@ def get_job(request: Request, job_id: int, db: Session = Depends(get_db)):
 def get_jobs(
     request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 ):
-    db_jobs = jobs.read_jobs(db=db, skip=skip, limit=limit)
+    db_jobs = crud.read_jobs(db=db, skip=skip, limit=limit)
     status_counts = {}
     for status_name in STATUSES:
         status_counts[status_name] = sum(
@@ -70,10 +68,9 @@ def get_jobs(
     )
 
 
-# Update
 @router.get("/{job_id}/edit", response_class=HTMLResponse)
 def get_edit_job_form(request: Request, job_id: int, db: Session = Depends(get_db)):
-    job = jobs.read_job(db=db, job_id=job_id)
+    job = crud.read_job(db=db, job_id=job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return templates.TemplateResponse(
@@ -91,7 +88,7 @@ def update_job(
     db: Session = Depends(get_db),
 ):
     try:
-        updated_job = jobs.update_job(db=db, job_id=job_id, job_update=job_update)
+        updated_job = crud.update_job(db=db, job_id=job_id, job_update=job_update)
         return templates.TemplateResponse(
             request, "view_job.html", {"job": updated_job}
         )
@@ -112,11 +109,10 @@ def update_job(
         ) from e
 
 
-# Delete
 @router.delete("/{job_id}")
 def delete_job(request: Request, job_id: int, db: Session = Depends(get_db)):
     try:
-        jobs.delete_job(db=db, job_id=job_id)
+        crud.delete_job(db=db, job_id=job_id)
         if request.headers["hx-current-url"].endswith("jobs"):
             return Response(status_code=status.HTTP_200_OK)
         else:

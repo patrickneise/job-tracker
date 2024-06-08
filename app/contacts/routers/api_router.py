@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.crud import contacts
+from app.contacts import crud
+from app.contacts.schema import Contact, ContactCreate
 from app.database import EntryNotFound, get_db
-from app.schemas.contact import Contact, ContactCreate
 
-router = APIRouter(prefix="/contacts", tags=["contacts"])
+router = APIRouter(prefix="/api/contacts", tags=["contacts"])
 
 
 @router.post(
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/contacts", tags=["contacts"])
     response_model=Contact,
 )
 def create_contact_api(
-    contact_type: contacts.CONTACT_TYPES,
+    contact_type: crud.CONTACT_TYPES,
     contact_create: ContactCreate,
     id: int,
     db: Session = Depends(get_db),
@@ -22,7 +22,7 @@ def create_contact_api(
     """Create a new Contact for a Job"""
     try:
         if contact_type == "job":
-            contact = contacts.create_contact(
+            contact = crud.create_contact(
                 db=db, contact_type=contact_type, id=id, contact_create=contact_create
             )
             return contact
@@ -43,9 +43,7 @@ def create_contact_api(
 @router.get("/{contact_id}", response_model=Contact)
 def get_job_contact_api(job_id: int, contact_id: int, db: Session = Depends(get_db)):
     """Get a Contact by Job.id and Contact.id"""
-    db_job_contact = contacts.get_job_contact(
-        db=db, job_id=job_id, contact_id=contact_id
-    )
+    db_job_contact = crud.get_job_contact(db=db, job_id=job_id, contact_id=contact_id)
     if db_job_contact is None:
         raise HTTPException(
             status_code=404, detail=f"Contact not found for Job `{job_id}`"
@@ -55,10 +53,10 @@ def get_job_contact_api(job_id: int, contact_id: int, db: Session = Depends(get_
 
 @router.get("", response_model=list[Contact])
 def get_job_contacts_api(
-    contact_type: contacts.CONTACT_TYPES | None = None,
+    contact_type: crud.CONTACT_TYPES | None = None,
     id: int | None = None,
     db: Session = Depends(get_db),
 ):
     """Get all Contacts by Job.id"""
-    db_job_contacts = contacts.get_job_contacts(db=db, contact_type=contact_type, id=id)
+    db_job_contacts = crud.get_job_contacts(db=db, contact_type=contact_type, id=id)
     return db_job_contacts

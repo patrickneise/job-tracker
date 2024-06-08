@@ -1,11 +1,9 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base
-
-from .mixins import TimestampMixin
+from app import models
 
 
-class Note(Base, TimestampMixin):
+class Note(models.Base, models.TimestampMixin):
     __tablename__ = "notes"
 
     id: Mapped[int] = mapped_column(primary_key=True)

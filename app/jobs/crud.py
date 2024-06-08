@@ -5,8 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import EntryConflict, EntryNotFound
-from app.models.job import Job
-from app.schemas.job import JobCreate, JobUpdate
+from app.jobs.models import Job
+from app.jobs.schema import JobCreate, JobUpdate
 
 CONTACT_TYPES = Literal["job", "interview"]
 

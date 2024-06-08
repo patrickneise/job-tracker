@@ -1,12 +1,32 @@
+from datetime import datetime
+from typing import Literal
+
 from sqlalchemy import (
+    TIMESTAMP,
     Column,
     ForeignKey,
     ForeignKeyConstraint,
     PrimaryKeyConstraint,
     Table,
 )
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.sql import func
 
-from app.models.base import Base
+
+class Base(DeclarativeBase): ...
+
+
+class TimestampMixin:
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+Status = Literal["watching", "applied", "interview", "offer", "rejected", "stale"]
+
 
 job_contact = Table(
     "job_contact",

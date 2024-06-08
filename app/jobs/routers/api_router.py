@@ -1,28 +1,28 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.crud import jobs
 from app.database import EntryConflict, EntryNotFound, get_db
-from app.schemas.job import Job, JobCreate, JobUpdate
+from app.jobs import crud
+from app.jobs.schema import Job, JobCreate, JobUpdate
 
-router = APIRouter(prefix="/jobs", tags=["jobs"])
+router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Job)
 def create_job_api(job_create: JobCreate, db: Session = Depends(get_db)):
     """Create a new Job"""
-    db_job = jobs.read_job_by_company_title(
+    db_job = crud.read_job_by_company_title(
         db=db, company=job_create.company, title=job_create.title
     )
     if db_job:
         raise HTTPException(status_code=400, detail="Job already exists")
-    return jobs.create_job(db=db, job_create=job_create)
+    return crud.create_job(db=db, job_create=job_create)
 
 
 @router.get("/{job_id}", response_model=Job)
 def read_job_api(job_id: int, db: Session = Depends(get_db)):
     """Get a Job by ID"""
-    db_job = jobs.read_job(db=db, job_id=job_id)
+    db_job = crud.read_job(db=db, job_id=job_id)
     if db_job is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return db_job
@@ -31,7 +31,7 @@ def read_job_api(job_id: int, db: Session = Depends(get_db)):
 @router.get("", response_model=list[Job])
 def read_jobs_api(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     "Get all Jobs"
-    jobs = jobs.read_jobs(db=db, skip=skip, limit=limit)
+    jobs = crud.read_jobs(db=db, skip=skip, limit=limit)
     return jobs
 
 
@@ -39,7 +39,7 @@ def read_jobs_api(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 def update_job_api(job_id: int, job_update: JobUpdate, db: Session = Depends(get_db)):
     """Update an existing Job"""
     try:
-        updated_job = jobs.update_job(db=db, job_id=job_id, job_update=job_update)
+        updated_job = crud.update_job(db=db, job_id=job_id, job_update=job_update)
         return updated_job
     except EntryNotFound:
         raise HTTPException(
@@ -62,7 +62,7 @@ def update_job_api(job_id: int, job_update: JobUpdate, db: Session = Depends(get
 def delete_job_api(job_id: int, db: Session = Depends(get_db)):
     """Delete an existing Job"""
     try:
-        jobs.delete_job(db=db, job_id=job_id)
+        crud.delete_job(db=db, job_id=job_id)
         return None
     except EntryNotFound:
         raise HTTPException(
