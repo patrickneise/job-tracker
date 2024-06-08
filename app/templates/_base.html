@@ -14,10 +14,21 @@
   <!-- <script src="https://unpkg.com/hyperscript.org@0.9.12"></script> -->
 </head>
 
-<body hx-boost="true" class="flex flex-col min-h-screen">
-  <div id="content">
-    {% block content %}
-    {% endblock %}
+<body hx-boost="true">
+
+  <div
+    class="flex flex-col w-screen h-screen overflow-auto text-gray-700 bg-gradient-to-tr from-blue-500 via-blue-300 to-indigo-200">
+    <div class="flex items-center flex-shrink-0 w-full h-16 px-10 bg-white bg-opacity-75">
+      <div class="ml-10">
+        <a class="mx-2 text-sm font-semibold text-indigo-700" href="/jobs" hx-target="#content">Jobs</a>
+        <a class="mx-2 text-sm font-semibold text-gray-600 hover:text-indigo-700" href="#">Contacts</a>
+        <a class="mx-2 text-sm font-semibold text-gray-600 hover:text-indigo-700" href="#">Tasks</a>
+      </div>
+    </div>
+    <div id="content" class="flex flex-col h-screen">
+      {% block content %}
+      {% endblock %}
+    </div>
   </div>
 </body>
 
