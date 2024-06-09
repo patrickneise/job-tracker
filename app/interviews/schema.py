@@ -3,11 +3,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 
-from fastapi import Form
-from pydantic import BaseModel, ConfigDict, HttpUrl
+from pydantic import BaseModel, ConfigDict, HttpUrl, field_serializer
 
-from app.schemas.contact import Contact
-from app.schemas.note import Note
+from app.contacts.schema import Contact
+from app.notes.schema import Note
+from app.utils import as_form
 
 
 class InterviewBase(BaseModel):
@@ -16,34 +16,21 @@ class InterviewBase(BaseModel):
     details: str
     url: HttpUrl | None = None
 
-
-class InterviewCreate(InterviewBase):
-    @classmethod
-    def as_form(
-        cls,
-        start: datetime = Form(...),
-        stop: datetime = Form(...),
-        details: str = Form(...),
-        url: HttpUrl = Form(...),
-    ) -> InterviewCreate:
-        return cls(start=start, stop=stop, details=details, url=url)
+    @field_serializer("url")
+    def serialize_url(self, url: HttpUrl, _info):
+        return str(url)
 
 
+@as_form
+class InterviewCreate(InterviewBase): ...
+
+
+@as_form
 class InterviewUpdate(InterviewBase):
     start: datetime | None = None
     stop: datetime | None = None
     details: str | None = None
     url: HttpUrl | None = None
-
-    @classmethod
-    def as_form(
-        cls,
-        start: datetime | None = Form(...),
-        stop: datetime | None = Form(...),
-        details: str | None = Form(...),
-        url: HttpUrl | None = Form(...),
-    ) -> InterviewUpdate:
-        return cls(start=start, stop=stop, details=details, url=url)
 
 
 class Interview(InterviewBase):
