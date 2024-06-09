@@ -4,9 +4,9 @@ from sqlalchemy import String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app import models
-from app.contacts.models import Contact
-from app.interviews.models import Interview
-from app.notes.models import Note
+from app.domain.contacts.models import Contact
+from app.domain.interviews.models import Interview
+from app.domain.notes.models import Note
 
 
 class Job(models.Base, models.TimestampMixin):

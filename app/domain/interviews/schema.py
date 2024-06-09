@@ -5,8 +5,8 @@ from typing import List
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, field_serializer
 
-from app.contacts.schema import Contact
-from app.notes.schema import Note
+from app.domain.contacts.schema import Contact
+from app.domain.notes.schema import Note
 from app.utils import as_form
 
 

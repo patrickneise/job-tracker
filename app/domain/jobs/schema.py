@@ -5,10 +5,10 @@ from typing import List
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, field_serializer
 
-from app.contacts.schema import Contact
-from app.interviews.schema import Interview
+from app.domain.contacts.schema import Contact
+from app.domain.interviews.schema import Interview
+from app.domain.notes.schema import Note
 from app.models import Status
-from app.notes.schema import Note
 from app.utils import as_form
 
 

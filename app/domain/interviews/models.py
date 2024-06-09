@@ -5,8 +5,8 @@ from sqlalchemy import TIMESTAMP, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app import models
-from app.contacts.models import Contact
-from app.notes.models import Note
+from app.domain.contacts.models import Contact
+from app.domain.notes.models import Note
 
 
 class Interview(models.Base, models.TimestampMixin):

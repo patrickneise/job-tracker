@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.contacts import crud
-from app.contacts.schema import Contact, ContactCreate
 from app.database import EntryNotFound, get_db
+from app.domain.contacts import crud
+from app.domain.contacts.schema import Contact, ContactCreate
 
 router = APIRouter(prefix="/api/contacts", tags=["contacts"])
 

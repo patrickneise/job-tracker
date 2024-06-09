@@ -2,21 +2,17 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from fastapi import Form
 from pydantic import BaseModel, ConfigDict
+
+from app.utils import as_form
 
 
 class NoteBase(BaseModel):
     note: str
 
 
-class NoteCreateUpdate(NoteBase):
-    @classmethod
-    def as_form(
-        cls,
-        note: str = Form(...),
-    ) -> NoteCreateUpdate:
-        return cls(note=note)
+@as_form
+class NoteCreateUpdate(NoteBase): ...
 
 
 class Note(NoteBase):

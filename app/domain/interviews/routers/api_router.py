@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import EntryConflict, EntryNotFound, get_db
-from app.interviews import crud
-from app.interviews.schema import Interview, InterviewCreate, InterviewUpdate
-from app.jobs.models import Job
+from app.domain.interviews import crud
+from app.domain.interviews.schema import Interview, InterviewCreate, InterviewUpdate
+from app.domain.jobs.models import Job
 
 router = APIRouter(prefix="/api/interviews", tags=["interviews"])
 

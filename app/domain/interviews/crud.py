@@ -3,9 +3,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import EntryConflict, EntryNotFound
-from app.interviews.models import Interview
-from app.interviews.schema import InterviewCreate, InterviewUpdate
-from app.jobs.models import Job
+from app.domain.interviews.models import Interview
+from app.domain.interviews.schema import InterviewCreate, InterviewUpdate
+from app.domain.jobs.models import Job
 
 
 def create_interview(

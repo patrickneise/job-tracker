@@ -7,8 +7,8 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.database import EntryConflict, EntryNotFound, get_db
-from app.jobs import crud
-from app.jobs.schema import JobCreate, JobUpdate
+from app.domain.jobs import crud
+from app.domain.jobs.schema import JobCreate, JobUpdate
 from app.models import Status
 
 STATUSES = list(get_args(Status))

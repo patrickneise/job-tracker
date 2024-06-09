@@ -3,8 +3,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import EntryConflict, EntryNotFound
-from app.jobs.models import Job
-from app.jobs.schema import JobCreate, JobUpdate
+from app.domain.jobs.models import Job
+from app.domain.jobs.schema import JobCreate, JobUpdate
 
 
 def create_job(db: Session, job_create: JobCreate) -> Job:

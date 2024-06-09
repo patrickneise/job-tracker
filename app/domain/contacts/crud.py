@@ -4,11 +4,11 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.contacts.models import Contact
-from app.contacts.schema import ContactCreate, ContactUpdate
 from app.database import EntryConflict, EntryNotFound
-from app.interviews.models import Interview
-from app.jobs.models import Job
+from app.domain.contacts.models import Contact
+from app.domain.contacts.schema import ContactCreate, ContactUpdate
+from app.domain.interviews.models import Interview
+from app.domain.jobs.models import Job
 
 CONTACT_TYPES = Literal["job", "interview"]
 
