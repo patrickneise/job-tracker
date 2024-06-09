@@ -13,7 +13,7 @@ from app.models import Status
 
 STATUSES = list(get_args(Status))
 
-router = APIRouter(prefix="/jobs", tags=["jobs"])
+router = APIRouter(prefix="/jobs", tags=["jobs", "app"])
 templates = Jinja2Templates(directory=Path("app") / "templates")
 
 

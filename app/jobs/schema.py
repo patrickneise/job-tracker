@@ -3,10 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 
-from fastapi import Form
 from pydantic import BaseModel, ConfigDict, HttpUrl, field_serializer
 
 from app.contacts.schema import Contact
+from app.interviews.schema import Interview
 from app.models import Status
 from app.notes.schema import Note
 from app.utils import as_form
@@ -33,53 +33,14 @@ class JobBase(BaseModel):
 class JobCreate(JobBase): ...
 
 
-# class JobCreate(JobBase):
-#     @classmethod
-#     def as_form(
-#         cls,
-#         company: str = Form(...),
-#         title: str = Form(...),
-#         description: str = Form(...),
-#         posting: HttpUrl = Form(...),
-#         website: HttpUrl = Form(...),
-#         status: Status = Form(...),
-#     ) -> JobCreate:
-#         return cls(
-#             company=company,
-#             title=title,
-#             description=description,
-#             posting=posting,
-#             website=website,
-#             status=status,
-#         )
-
-
-class JobUpdate(BaseModel):
+@as_form
+class JobUpdate(JobBase):
     company: str | None = None
     title: str | None = None
     description: str | None = None
     posting: HttpUrl | None = None
     website: HttpUrl | None = None
     status: Status | None = None
-
-    @classmethod
-    def as_form(
-        cls,
-        company: str | None = Form(...),
-        title: str | None = Form(...),
-        description: str | None = Form(...),
-        posting: HttpUrl | None = Form(...),
-        website: HttpUrl | None = Form(...),
-        status: Status = Form(...),
-    ) -> JobUpdate:
-        return cls(
-            company=company,
-            title=title,
-            description=description,
-            posting=posting,
-            website=website,
-            status=status,
-        )
 
 
 class Job(JobBase):
@@ -91,4 +52,5 @@ class Job(JobBase):
     updated_at: datetime
 
     contacts: List[Contact]
+    interviews: List[Interview]
     notes: List[Note]

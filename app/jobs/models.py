@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app import models
@@ -14,9 +14,9 @@ class Job(models.Base, models.TimestampMixin):
     __table_args__ = (UniqueConstraint("company", "title"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    company: Mapped[str]
-    title: Mapped[str]
-    description: Mapped[str]
+    company: Mapped[str] = mapped_column(String(80))
+    title: Mapped[str] = mapped_column(String(80))
+    description: Mapped[str] = mapped_column(Text)
     posting: Mapped[str]
     website: Mapped[str]
 

@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Job)
-def create_job_api(job_create: JobCreate, db: Session = Depends(get_db)):
+def create_job(job_create: JobCreate, db: Session = Depends(get_db)):
     """Create a new Job"""
     db_job = crud.read_job_by_company_title(
         db=db, company=job_create.company, title=job_create.title
@@ -20,7 +20,7 @@ def create_job_api(job_create: JobCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/{job_id}", response_model=Job)
-def read_job_api(job_id: int, db: Session = Depends(get_db)):
+def read_job(job_id: int, db: Session = Depends(get_db)):
     """Get a Job by ID"""
     db_job = crud.read_job(db=db, job_id=job_id)
     if db_job is None:
@@ -29,14 +29,14 @@ def read_job_api(job_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=list[Job])
-def read_jobs_api(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     "Get all Jobs"
     jobs = crud.read_jobs(db=db, skip=skip, limit=limit)
     return jobs
 
 
 @router.put("/{job_id}", status_code=status.HTTP_202_ACCEPTED, response_model=Job)
-def update_job_api(job_id: int, job_update: JobUpdate, db: Session = Depends(get_db)):
+def update_job(job_id: int, job_update: JobUpdate, db: Session = Depends(get_db)):
     """Update an existing Job"""
     try:
         updated_job = crud.update_job(db=db, job_id=job_id, job_update=job_update)
@@ -59,7 +59,7 @@ def update_job_api(job_id: int, job_update: JobUpdate, db: Session = Depends(get
 
 
 @router.delete("/{job_id}", status_code=status.HTTP_202_ACCEPTED)
-def delete_job_api(job_id: int, db: Session = Depends(get_db)):
+def delete_job(job_id: int, db: Session = Depends(get_db)):
     """Delete an existing Job"""
     try:
         crud.delete_job(db=db, job_id=job_id)

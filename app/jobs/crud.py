@@ -1,5 +1,3 @@
-from typing import Literal
-
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -8,12 +6,9 @@ from app.database import EntryConflict, EntryNotFound
 from app.jobs.models import Job
 from app.jobs.schema import JobCreate, JobUpdate
 
-CONTACT_TYPES = Literal["job", "interview"]
-
 
 def create_job(db: Session, job_create: JobCreate) -> Job:
     """Create a new Job in DB"""
-    print(job_create.model_dump(mode="json"))
     job = Job(**job_create.model_dump())
     db.add(job)
     db.commit()
