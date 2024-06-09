@@ -19,6 +19,8 @@ def create_job(db: Session, job_create: JobCreate) -> Job:
 def read_job(db: Session, job_id: int) -> Job:
     """Get Job from DB"""
     job = db.get(Job, job_id)
+    if not job:
+        raise EntryNotFound
     return job
 
 
