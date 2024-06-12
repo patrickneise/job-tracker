@@ -32,10 +32,18 @@ def read_interview(db: Session, interview_id: int) -> Interview:
     return interview
 
 
-def read_interviews(db: Session, skip: int = 0, limit: int = 100) -> list[Interview]:
+def read_interviews(
+    db: Session, job_id: int, skip: int = 0, limit: int = 100
+) -> list[Interview]:
     """Get Interviews from DB"""
-    stmt = select(Interview).offset(skip).limit(limit)
-    interviews = db.execute(stmt).scalars().all()
+    if job_id:
+        job = db.get(Job, job_id)
+        if not job:
+            raise EntryNotFound
+        interviews = job.interviews
+    else:
+        stmt = select(Interview).offset(skip).limit(limit)
+        interviews = db.execute(stmt).scalars().all()
     return interviews
 
 

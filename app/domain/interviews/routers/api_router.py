@@ -4,9 +4,8 @@ from sqlalchemy.orm import Session
 from app.database import EntryConflict, EntryNotFound, get_db
 from app.domain.interviews import crud
 from app.domain.interviews.schema import Interview, InterviewCreate, InterviewUpdate
-from app.domain.jobs.models import Job
 
-router = APIRouter(prefix="/api/interviews", tags=["interviews"])
+router = APIRouter(prefix="/api/jobs/{job_id}/interviews")
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Interview)
@@ -36,12 +35,15 @@ def read_interview(interview_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=list[Interview])
-def read_interviews_by_job_id(job_id: int, db: Session = Depends(get_db)):
-    "Get all Interviews for Job.id"
-    db_job = db.get(Job, job_id)
-    if db_job is None:
+def read_interviews(
+    job_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+):
+    "Get all Interviews"
+    try:
+        interviews = crud.read_interviews(db=db, job_id=job_id, skip=skip, limit=limit)
+        return interviews
+    except EntryNotFound:
         raise HTTPException(status_code=404, detail="Job not found")
-    return db_job.interviews
 
 
 @router.put(

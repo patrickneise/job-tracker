@@ -9,6 +9,7 @@ from app.database import engine
 from app.domain.contacts import routers as contacts_router
 from app.domain.interviews import routers as interviews_router
 from app.domain.jobs import routers as jobs_router
+from app.domain.notes import routers as notes_router
 from app.models import Base
 
 Base.metadata.create_all(bind=engine)
@@ -19,6 +20,7 @@ app.mount("/static", StaticFiles(directory=Path("app") / "static"), name="static
 app.include_router(contacts_router.router)
 app.include_router(interviews_router.router)
 app.include_router(jobs_router.router)
+app.include_router(notes_router.router)
 
 templates = Jinja2Templates(directory=Path("app") / "templates")
 

@@ -1,19 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import EntryConflict, EntryNotFound, get_db
 from app.domain.contacts import crud
 from app.domain.contacts.schema import Contact, ContactCreate, ContactUpdate
 
+router = APIRouter(prefix="/contacts")
 
-def get_contact_type(request: Request) -> crud.CONTACT_TYPES:
-    path_parts = request.url.path.split("/")
-    contacts_index = path_parts.index("contacts")
-    parent_type = path_parts[contacts_index - 2]
-    return parent_type
-
-
-router = APIRouter(prefix="/{contact_parent_id}/contacts")
+# TODO: add existing contact to Job or Interview
 
 
 @router.post(
@@ -22,25 +18,16 @@ router = APIRouter(prefix="/{contact_parent_id}/contacts")
     response_model=Contact,
 )
 def create_contact(
-    contact_parent_id: int,
     contact_create: ContactCreate,
-    contact_type: crud.CONTACT_TYPES = Depends(get_contact_type),
     db: Session = Depends(get_db),
 ):
     """Create a new Contact for a Job"""
     try:
         contact = crud.create_contact(
             db=db,
-            contact_type=contact_type,
-            contact_parent_id=contact_parent_id,
             contact_create=contact_create,
         )
         return contact
-    except EntryNotFound:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No {contact_type.upper()} with this id: `{id}` found",
-        )
     except EntryConflict:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -63,16 +50,9 @@ def read_contact(contact_id: int, db: Session = Depends(get_db)):
     return contact
 
 
-@router.get("", response_model=list[Contact])
-def read_contacts(
-    contact_parent_id: int,
-    contact_type: crud.CONTACT_TYPES = Depends(get_contact_type),
-    db: Session = Depends(get_db),
-):
-    """Get all Contacts by Job.id"""
-    contacts = crud.read_contacts(
-        db=db, contact_type=contact_type, contact_parent_id=contact_parent_id
-    )
+@router.get("", response_model=List[Contact])
+def read_contacts(db: Session = Depends(get_db)):
+    contacts = crud.read_contacts(db=db)
     return contacts
 
 
@@ -80,20 +60,12 @@ def read_contacts(
     "/{contact_id}", status_code=status.HTTP_202_ACCEPTED, response_model=Contact
 )
 def update_contact(
-    contact_id: int,
-    contact_update: ContactUpdate,
-    contact_parent_id: int,
-    contact_type: crud.CONTACT_TYPES = Depends(get_contact_type),
-    db: Session = Depends(get_db),
+    contact_id: int, contact_update: ContactUpdate, db: Session = Depends(get_db)
 ):
     """Update an existing Contact"""
     try:
         updated_contact = crud.update_contact(
-            db=db,
-            contact_id=contact_id,
-            contact_update=contact_update,
-            contact_parent_id=contact_parent_id,
-            contact_type=contact_type,
+            db=db, contact_id=contact_id, contact_update=contact_update
         )
         return updated_contact
     except EntryNotFound:
@@ -115,18 +87,13 @@ def update_contact(
 
 @router.delete("/{contact_id}", status_code=status.HTTP_202_ACCEPTED)
 def delete_contact(
-    contact_parent_id: int,
     contact_id: int,
-    contact_type: crud.CONTACT_TYPES = Depends(get_contact_type),
     db: Session = Depends(get_db),
 ):
     """Delete an existing Contact"""
-    print(contact_parent_id, contact_id, contact_type)
     try:
-        crud.remove_parent_contact(
+        crud.delete_contact(
             db=db,
-            contact_type=contact_type,
-            contact_parent_id=contact_parent_id,
             contact_id=contact_id,
         )
         return None

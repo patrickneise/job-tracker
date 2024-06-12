@@ -5,7 +5,7 @@ from app.database import EntryConflict, EntryNotFound, get_db
 from app.domain.jobs import crud
 from app.domain.jobs.schema import Job, JobCreate, JobUpdate
 
-router = APIRouter(prefix="/api/jobs", tags=["jobs"])
+router = APIRouter(prefix="/jobs")
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Job)

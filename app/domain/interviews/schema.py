@@ -39,5 +39,5 @@ class Interview(InterviewBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    contacts: List[Contact]
-    notes: List[Note]
+    contacts: List[Contact] | None = None
+    notes: List[Note] | None = None

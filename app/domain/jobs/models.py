@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List
 
 from sqlalchemy import String, Text, UniqueConstraint
@@ -19,12 +21,14 @@ class Job(models.Base, models.TimestampMixin):
     description: Mapped[str] = mapped_column(Text)
     posting: Mapped[str]
     website: Mapped[str]
-
     status: Mapped[models.Status]
-    interviews: Mapped[List["Interview"]] = relationship(
-        "Interview", secondary=models.job_interview
+
+    interviews: Mapped[List[Interview]] = relationship(
+        "Interview", back_populates="jobs"
     )
-    contacts: Mapped[List["Contact"]] = relationship(
-        "Contact", secondary=models.job_contact
+    contacts: Mapped[List[Contact]] = relationship(
+        secondary="job_contact", back_populates="jobs"
     )
-    notes: Mapped[List["Note"]] = relationship("Note", secondary=models.job_note)
+    notes: Mapped[List[Note]] = relationship(
+        "Note", secondary="job_note", back_populates="jobs"
+    )

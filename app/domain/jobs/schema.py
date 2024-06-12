@@ -51,6 +51,6 @@ class Job(JobBase):
     created_at: datetime
     updated_at: datetime
 
-    contacts: List[Contact]
-    interviews: List[Interview]
-    notes: List[Note]
+    contacts: List[Contact] | None = None
+    interviews: List[Interview] | None = None
+    notes: List[Note] | None = None
