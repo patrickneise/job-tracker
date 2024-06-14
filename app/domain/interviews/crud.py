@@ -15,15 +15,13 @@ def create_interview(
     job = db.get(Job, job_id)
     if not job:
         raise EntryNotFound
-    interview = Interview(**interview_create.model_dump())
     try:
+        interview = Interview(**interview_create.model_dump())
         job.interviews.append(interview)
         db.commit()
-        db.refresh(job)
+        return interview
     except IntegrityError as e:
-        db.rollback()
         raise EntryConflict from e
-    return interview
 
 
 def read_interview(db: Session, interview_id: int) -> Interview:
@@ -64,10 +62,8 @@ def update_interview(
         db.refresh(interview)
         return interview
     except IntegrityError as e:
-        db.rollback()
         raise EntryConflict from e
     except Exception as e:
-        db.rollback()
         raise Exception from e
 
 

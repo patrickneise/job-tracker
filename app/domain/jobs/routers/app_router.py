@@ -13,7 +13,7 @@ from app.models import Status
 
 STATUSES = list(get_args(Status))
 
-router = APIRouter(prefix="/api/jobs")
+router = APIRouter(prefix="/jobs")
 templates = Jinja2Templates(directory=Path("app") / "templates")
 
 
@@ -30,18 +30,19 @@ def create_job(
     job_create: JobCreate = Depends(JobCreate.as_form),
     db: Session = Depends(get_db),
 ):
-    db_job = crud.read_job_by_company_title(
-        db=db, company=job_create.company, title=job_create.title
-    )
-    if db_job:
-        raise HTTPException(status_code=400, detail="Job already exists")
-    created_job = crud.create_job(db=db, job_create=job_create)
-    return templates.TemplateResponse(
-        request,
-        "view_job.html",
-        {"job": created_job},
-        headers={"HX-Push-Url": f"/jobs/{created_job.id}"},
-    )
+    try:
+        job = crud.create_job(db=db, job_create=job_create)
+        return templates.TemplateResponse(
+            request,
+            "view_job.html",
+            {"job": job},
+            headers={"HX-Push-Url": f"/jobs/{job.id}"},
+        )
+    except EntryConflict as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="An job with the given details already exists.",
+        ) from e
 
 
 @router.get("/{job_id}", response_class=HTMLResponse)
@@ -62,7 +63,6 @@ def get_jobs(
         status_counts[status_name] = sum(
             [True for job in db_jobs if job.status == status_name]
         )
-    print(status_counts)
     return templates.TemplateResponse(
         request, "view_jobs.html", {"jobs": db_jobs, "status_counts": status_counts}
     )

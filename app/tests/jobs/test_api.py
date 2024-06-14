@@ -17,6 +17,25 @@ def test_create_get_job(test_client, job_payload):
     assert get_response_json["website"] == job_payload["website"]
 
 
+def test_create_job_fail(test_client, job_payload):
+    job_payload.pop("company")
+    create_response = test_client.post(BASE_PATH, json=job_payload)
+    assert create_response.status_code == 422
+
+
+def test_create_existing_job(test_client, job_payload):
+    create_response = test_client.post(BASE_PATH, json=job_payload)
+    assert create_response.status_code == 201
+
+    second_create_response = test_client.post(BASE_PATH, json=job_payload)
+    assert second_create_response.status_code == 409
+
+
+def test_get_missing_job(test_client):
+    response = test_client.get(f"{BASE_PATH}/1")
+    assert response.status_code == 404
+
+
 def test_create_get_jobs(test_client, jobs_payload):
     for job_payload in jobs_payload:
         create_response = test_client.post(BASE_PATH, json=job_payload)
@@ -73,20 +92,7 @@ def test_get_jobs_skip(test_client, jobs_payload):
     assert get_response_json[0]["website"] == jobs_payload[1]["website"]
 
 
-def test_api_delete_exiting_job(test_client, job_payload):
-    create_response = test_client.post("/api/jobs", json=job_payload)
-    assert create_response.status_code == 201
-
-    delete_response = test_client.delete(f"/api/jobs/{job_payload["id"]}")
-    assert delete_response.status_code == 202
-
-
-def test_api_delete_nonexiting_job(test_client, job_payload):
-    delete_response = test_client.delete(f"/api/jobs/{job_payload["id"]}")
-    assert delete_response.status_code == 404
-
-
-def test_api_update_job(test_client, job_payload):
+def test_update_job(test_client, job_payload):
     create_response = test_client.post("/api/jobs", json=job_payload)
     assert create_response.status_code == 201
 
@@ -101,3 +107,35 @@ def test_api_update_job(test_client, job_payload):
     assert update_response_json["description"] == update_payload["description"]
     assert update_response_json["posting"] == job_payload["posting"]
     assert update_response_json["website"] == job_payload["website"]
+
+
+def test_update_missing_job(test_client):
+    update_payload = {"description": "Chief Technology Officer at Netflix"}
+    update_response = test_client.put("/api/jobs/1", json=update_payload)
+    assert update_response.status_code == 404
+
+
+def test_update_job_to_current_job(test_client, jobs_payload):
+    for job_payload in jobs_payload:
+        create_response = test_client.post(BASE_PATH, json=job_payload)
+        assert create_response.status_code == 201
+
+    update_payload = {
+        "company": jobs_payload[0]["company"],
+        "title": jobs_payload[0]["title"],
+    }
+    update_response = test_client.put("/api/jobs/2", json=update_payload)
+    assert update_response.status_code == 409
+
+
+def test_delete_existing_job(test_client, job_payload):
+    create_response = test_client.post("/api/jobs", json=job_payload)
+    assert create_response.status_code == 201
+
+    delete_response = test_client.delete(f"/api/jobs/{job_payload["id"]}")
+    assert delete_response.status_code == 202
+
+
+def test_delete_nonexisting_job(test_client, job_payload):
+    delete_response = test_client.delete(f"/api/jobs/{job_payload["id"]}")
+    assert delete_response.status_code == 404

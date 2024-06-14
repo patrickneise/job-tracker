@@ -11,12 +11,14 @@ router = APIRouter(prefix="/jobs")
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Job)
 def create_job(job_create: JobCreate, db: Session = Depends(get_db)):
     """Create a new Job"""
-    db_job = crud.read_job_by_company_title(
-        db=db, company=job_create.company, title=job_create.title
-    )
-    if db_job:
-        raise HTTPException(status_code=400, detail="Job already exists")
-    return crud.create_job(db=db, job_create=job_create)
+    try:
+        job = crud.create_job(db=db, job_create=job_create)
+        return job
+    except EntryConflict as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="An job with the given details already exists.",
+        ) from e
 
 
 @router.get("/{job_id}", response_model=Job)
@@ -24,7 +26,9 @@ def read_job(job_id: int, db: Session = Depends(get_db)):
     """Get a Job by ID"""
     db_job = crud.read_job(db=db, job_id=job_id)
     if db_job is None:
-        raise HTTPException(status_code=404, detail="Job not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
     return db_job
 
 
@@ -58,6 +62,7 @@ def update_job(job_id: int, job_update: JobUpdate, db: Session = Depends(get_db)
         ) from e
 
 
+# TODO: figure out how to cascade delete of interviews, notes, contacts
 @router.delete("/{job_id}", status_code=status.HTTP_202_ACCEPTED)
 def delete_job(job_id: int, db: Session = Depends(get_db)):
     """Delete an existing Job"""
@@ -70,6 +75,7 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
             detail=f"No Job with this id: `{job_id}` found",
         )
     except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while deleting the job.",

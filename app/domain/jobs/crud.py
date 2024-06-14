@@ -9,18 +9,18 @@ from app.domain.jobs.schema import JobCreate, JobUpdate
 
 def create_job(db: Session, job_create: JobCreate) -> Job:
     """Create a new Job in DB"""
-    job = Job(**job_create.model_dump())
-    db.add(job)
-    db.commit()
-    db.refresh(job)
+    try:
+        job = Job(**job_create.model_dump())
+        db.add(job)
+        db.commit()
+    except IntegrityError as e:
+        raise EntryConflict from e
     return job
 
 
 def read_job(db: Session, job_id: int) -> Job:
     """Get Job from DB"""
     job = db.get(Job, job_id)
-    if not job:
-        raise EntryNotFound
     return job
 
 
@@ -30,13 +30,6 @@ def read_jobs(db: Session, skip: int = 0, limit: int = 100) -> list[Job]:
     stmt = select(Job).offset(skip).limit(limit)
     jobs = db.execute(stmt).scalars().all()
     return jobs
-
-
-def read_job_by_company_title(db: Session, company: str, title: str) -> Job:
-    """Get Job by `company` and `title`"""
-    stmt = select(Job).filter(Job.company == company and Job.title == title)
-    job = db.execute(stmt).scalar()
-    return job
 
 
 def update_job(db: Session, job_id: int, job_update: JobUpdate) -> Job:
@@ -52,10 +45,8 @@ def update_job(db: Session, job_id: int, job_update: JobUpdate) -> Job:
         db.refresh(job)
         return job
     except IntegrityError as e:
-        db.rollback()
         raise EntryConflict from e
     except Exception as e:
-        db.rollback()
         raise Exception from e
 
 
