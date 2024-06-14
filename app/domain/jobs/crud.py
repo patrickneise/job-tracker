@@ -24,7 +24,6 @@ def read_job(db: Session, job_id: int) -> Job:
     return job
 
 
-# TODO: add optional query filter for status?
 def read_jobs(db: Session, skip: int = 0, limit: int = 100) -> list[Job]:
     """Get all Jobs from DB"""
     stmt = select(Job).offset(skip).limit(limit)

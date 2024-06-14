@@ -9,8 +9,6 @@ from app.domain.contacts.schema import Contact, ContactCreate, ContactUpdate
 
 router = APIRouter(prefix="/contacts")
 
-# TODO: add existing contact to Job or Interview
-
 
 @router.post(
     "",

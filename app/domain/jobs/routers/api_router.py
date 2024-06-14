@@ -62,7 +62,6 @@ def update_job(job_id: int, job_update: JobUpdate, db: Session = Depends(get_db)
         ) from e
 
 
-# TODO: figure out how to cascade delete of interviews, notes, contacts
 @router.delete("/{job_id}", status_code=status.HTTP_202_ACCEPTED)
 def delete_job(job_id: int, db: Session = Depends(get_db)):
     """Delete an existing Job"""
@@ -75,7 +74,6 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
             detail=f"No Job with this id: `{job_id}` found",
         )
     except Exception as e:
-        print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while deleting the job.",

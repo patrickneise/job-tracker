@@ -17,7 +17,6 @@ CONTACT_MODELS = {
 }
 
 
-# TODO: separate "add contact" and "create contact"?
 def create_contact(
     db: Session,
     contact_create: ContactCreate,
@@ -97,7 +96,6 @@ def update_contact(
         raise Exception from e
 
 
-# TODO: separate "remove contact" and "delete contact"?
 def remove_parent_contact(
     db: Session, contact_type: CONTACT_TYPES, contact_parent_id: int, contact_id: int
 ) -> None:

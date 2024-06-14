@@ -121,7 +121,6 @@ def delete_contact(
     db: Session = Depends(get_db),
 ):
     """Delete an existing Contact"""
-    print(contact_parent_id, contact_id, contact_type)
     try:
         crud.remove_parent_contact(
             db=db,
