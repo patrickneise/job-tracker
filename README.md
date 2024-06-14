@@ -40,7 +40,7 @@ Build a project that leverages HTMX for the frontend while also providing JSON A
 Clone the repo
 
 ```sh
-$ git clone
+$ git clone https://github.com/patrickneise/job-tracker.git
 ```
 
 Open the folder [in container](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container).
